@@ -1,0 +1,6 @@
+*.log
+build
+.catkin_tools
+devel
+logs
+.DS_Store
