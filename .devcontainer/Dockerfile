@@ -34,9 +34,24 @@ RUN sudo apt install python3.11 -y
 RUN sudo apt-get -y install python3-pip
 
 #Install Conda
-#RUN sudo apt-get install wget
-#RUN sudo wget https://repo.anaconda.com/archive/Anaconda3-2023.07-2-Linux-x86_64.sh -O /setup/anaconda.sh
-#RUN sudo bash /setup/anaconda.sh -b
+RUN sudo apt-get install wget
+RUN sudo wget https://repo.anaconda.com/archive/Anaconda3-2023.07-2-Linux-x86_64.sh -O /setup/anaconda.sh
+RUN sudo bash /setup/anaconda.sh -b -p /home/vscode/anaconda3
+RUN sudo rm /setup/anaconda.sh
+RUN sudo chown -R vscode /home/vscode/anaconda3
+
+ENV PATH /home/vscode/anaconda3/bin:$PATH
+RUN conda update conda -y
+# RUN conda update anaconda -y
+# Set Solver to libmamba
+RUN conda update --all -y
+RUN conda install -n base conda-libmamba-solver
+RUN conda config --set solver libmamba 
+RUN conda init
+
+# Setup Conda environment
+COPY foundations.yaml /home/vscode/foundations.yaml
+RUN conda env create -f /home/vscode/foundations.yaml
 
 
 #Install catkin

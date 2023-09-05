@@ -11,9 +11,5 @@
   "mounts": [
     "source=${localEnv:HOME}${localEnv:USERPROFILE}/.bash_history,target=/home/vscode/.bash_history,type=bind"
   ],
-  "features": {
-    "ghcr.io/devcontainers/features/anaconda:1": {
-      "version": "1.0.11"
-    }
-  }
+  "features": {}
 }
