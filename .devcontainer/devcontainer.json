@@ -4,7 +4,10 @@
   "runArgs": [
     "--privileged",
     "--network=host",
-    "--platform=linux/amd64"
+    "--env=\"DISPLAY\"",
+    "--user=$(id -u)",
+    "--platform=linux/amd64",
+    "--volume=\"/tmp/.X11-unix:/tmp/.X11-unix:rw\""
   ],
   "workspaceMount": "source=${localWorkspaceFolder},target=/${localWorkspaceFolderBasename},type=bind",
   "workspaceFolder": "/${localWorkspaceFolderBasename}",
