@@ -5,4 +5,5 @@
 
 ## Running muSHR Visualization
 - Run `mushr_noetic` in your shell
+- Run `source ~/.bashrc` in the container shell
 - Run `roslaunch mushr_sim teleop.launch` to start the SIM

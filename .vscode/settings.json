@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./mushr_ws/src/introduction/src"
+    ]
+}
