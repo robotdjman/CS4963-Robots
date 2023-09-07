@@ -82,15 +82,15 @@ RUN sudo pip3 install Cython torch torchvision torchaudio numpy scipy networkx p
 RUN sudo ln -s /usr/include/opencv4 /usr/include/opencv
 
 # Auto source this workspace on terminal startup
-RUN echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+RUN echo "source /CS4963-Robots/catkin_ws/devel/setup.bash" >> ~/.bashrc
 
 # Install rangelibc
-RUN python3 /CS4963-Robots/catkin_ws/src/range_libc/pywrapper/setup.py install
-RUN rm -rf /CS4963-Robots/catkin_ws/src/range_libc
+#RUN git clone https://github.com/gftabor/range_libc ~/range_libc
+#RUN python3 ~/range_libc/pywrapper/setup.py install
 
 # Create default RVIZ setup
-RUN mkdir ~/.rviz
-RUN cp /catkin_ws/src/mushr/mushr_utils/rviz/default.rviz ~/.rviz/
+#RUN mkdir ~/.rviz
+#RUN cp /CS4963-Robots/catkin_ws/src/mushr/mushr_utils/rviz/default.rviz ~/.rviz/
 
 # MuSHR Hardware drivers
 # Hardware drivers (Only needed on physical robot)
