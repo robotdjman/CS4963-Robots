@@ -1,6 +1,11 @@
 {
   "name": "noetic desktop",
   "dockerFile": "Dockerfile",
+  "build": {
+    "args": {
+      "platform": "linux/amd64"
+    }
+  },
   "runArgs": [
     "--privileged",
     "--network=host",
