@@ -9,14 +9,14 @@
   "runArgs": [
     "--privileged",
     "--network=host",
-    "--env=\"DISPLAY\"",
-    "--platform=linux/amd64"
+    "--platform=linux/amd64",
+    "--env=\"DISPLAY=host.docker.internal\""
   ],
   "workspaceMount": "source=${localWorkspaceFolder},target=/${localWorkspaceFolderBasename},type=bind",
   "workspaceFolder": "/${localWorkspaceFolderBasename}",
   "mounts": [
     "source=${localEnv:HOME}${localEnv:USERPROFILE}/.bash_history,target=/home/vscode/.bash_history,type=bind",
-    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind"
+    "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
   ],
   "features": {}
 }
