@@ -1,6 +1,6 @@
 {
   "name": "noetic desktop",
-  "dockerFile": "Dockerfile",
+  "dockerFile": "Dockerfile.noconda",
   "build": {
     "args": {
       "platform": "linux/amd64"

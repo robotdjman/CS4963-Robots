@@ -59,40 +59,15 @@ RUN sudo apt install -y git
 
 # Rosdep update
 RUN rosdep update
-
-RUN mkdir /home/vscode/setup
-
-# --------------------------- MuSHR Deps ---------------------------
-# Install git, tkinter, wget, g++, vim, tmux, networking stuff, apt-add-repository
-RUN sudo apt-get install -y git-all python3-tk wget g++ vim tmux net-tools iputils-ping software-properties-common iproute2
-RUN sudo apt-get update
-RUN sudo apt-get install -y python3-vcstool python3-pip
-
-# Install extra ROS packages
-RUN sudo apt-get install -y ros-noetic-ackermann-msgs ros-noetic-map-server ros-noetic-urg-node ros-noetic-robot-state-publisher ros-noetic-xacro ros-noetic-joy ros-noetic-ddynamic-reconfigure ros-noetic-fake-localization ros-noetic-gmapping ros-noetic-rosbridge-suite ros-noetic-sbpl
-
-# Install Cython, PyTorch 1.10 at least!
-RUN sudo pip3 install Cython torch torchvision torchaudio numpy scipy networkx progress
+RUN rosdep init
 
 # Create OpenCV symbolic link
 RUN sudo ln -s /usr/include/opencv4 /usr/include/opencv
 
 # Auto source this workspace on terminal startup
-RUN echo "source /CS4963-Robots/mushr_ws/devel/setup.bash" >> ~/.bashrc
 RUN echo "source /CS4963-Robots/dependencies_ws/devel/setup.bash" >> ~/.bashrc
+RUN echo "source /CS4963-Robots/mushr_ws/devel/setup.bash" >> ~/.bashrc
 
-# Install rangelibc
-#RUN git clone https://github.com/gftabor/range_libc ~/range_libc
-#RUN python3 ~/range_libc/pywrapper/setup.py install
-
-# Create default RVIZ setup
-#RUN mkdir ~/.rviz
-#RUN cp /CS4963-Robots/catkin_ws/src/mushr/mushr_utils/rviz/default.rviz ~/.rviz/
-
-# MuSHR Hardware drivers
-# Hardware drivers (Only needed on physical robot)
-#COPY mushr_install_hw_drivers.bash /home/vscode/setup/mushr_install_hw_drivers.bash
-#RUN if [ "$REAL" = 1 ] ; then chmod +x /home/vscode/setup/mushr_install_hw_drivers.bash && /home/vscode/setup/mushr_install_hw_drivers.bash ; fi
 
 
 #TODO:
