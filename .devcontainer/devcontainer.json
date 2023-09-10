@@ -28,7 +28,8 @@
         "remote.autoForwardPorts": false
       },
       "extensions": [
-        "ms-python.python"
+        "ms-python.python",
+        "eamodio.gitlens"
       ]
     }
   }
