@@ -6,9 +6,9 @@
       "platform": "linux/amd64"
     }
   },
+  "remoteUser": "vscode",
   "runArgs": [
     "--privileged",
-    "--network=host",
     "--platform=linux/amd64",
     "--env=\"DISPLAY=host.docker.internal\""
   ],
@@ -18,5 +18,13 @@
     "source=${localEnv:HOME}${localEnv:USERPROFILE}/.bash_history,target=/home/vscode/.bash_history,type=bind",
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
   ],
-  "features": {}
+  "features": {},
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "remote.autoForwardPorts": false
+      },
+      "extensions": []
+    }
+  }
 }

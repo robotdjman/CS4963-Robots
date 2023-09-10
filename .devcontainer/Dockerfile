@@ -47,6 +47,9 @@ RUN mamba init
 # Setup Conda environment
 COPY foundations.yaml /home/vscode/foundations.yaml
 RUN mamba env create -f /home/vscode/foundations.yaml
+RUN mamba init
+RUN conda init
+RUN conda update conda -y
 
 # Source the ROS setup file
 RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
@@ -66,7 +69,7 @@ RUN mkdir /home/vscode/setup
 # Install git, tkinter, wget, g++, vim, tmux, networking stuff, apt-add-repository
 RUN sudo apt-get install -y git-all python3-tk wget g++ vim tmux net-tools iputils-ping software-properties-common iproute2
 RUN sudo apt-get update
-RUN sudo apt-get install -y python3-vcstool python3-pip
+RUN sudo apt-get install -y python3-vcstool python3-pip curl
 
 # Install extra ROS packages
 RUN sudo apt-get install -y ros-noetic-ackermann-msgs ros-noetic-map-server ros-noetic-urg-node ros-noetic-robot-state-publisher ros-noetic-xacro ros-noetic-joy ros-noetic-ddynamic-reconfigure ros-noetic-fake-localization ros-noetic-gmapping ros-noetic-rosbridge-suite ros-noetic-sbpl
@@ -78,8 +81,9 @@ RUN sudo pip3 install Cython torch torchvision torchaudio numpy scipy networkx p
 RUN sudo ln -s /usr/include/opencv4 /usr/include/opencv
 
 # Auto source this workspace on terminal startup
+RUN echo "conda activate foundations"
 RUN echo "source /CS4963-Robots/mushr_ws/devel/setup.bash" >> ~/.bashrc
-RUN echo "source /CS4963-Robots/dependencies_ws/devel/setup.bash" >> ~/.bashrc
+RUN echo "source /CS4963-Robots/dependencies_ws/devel/setup.bash --extend" >> ~/.bashrc
 
 # Install rangelibc
 #RUN git clone https://github.com/gftabor/range_libc ~/range_libc
