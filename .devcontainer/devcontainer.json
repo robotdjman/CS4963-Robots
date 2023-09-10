@@ -10,7 +10,7 @@
   "runArgs": [
     "--privileged",
     "--platform=linux/amd64",
-    "--env=\"DISPLAY=host.docker.internal\""
+    "--env=\"DISPLAY=host.docker.internal:0\""
   ],
   "workspaceMount": "source=${localWorkspaceFolder},target=/${localWorkspaceFolderBasename},type=bind",
   "workspaceFolder": "/${localWorkspaceFolderBasename}",
@@ -19,12 +19,17 @@
     "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
   ],
   "features": {},
+  "forwardPorts": [
+    "9090:9090"
+  ],
   "customizations": {
     "vscode": {
       "settings": {
         "remote.autoForwardPorts": false
       },
-      "extensions": []
+      "extensions": [
+        "ms-python.python"
+      ]
     }
   }
 }
