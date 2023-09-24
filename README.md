@@ -10,4 +10,5 @@
 ## Common commands
 
 `roslaunch cse478 teleop.launch`
+`roslaunch cse478 foxgloveteleop.launch`
 `rostopic list` Lists all topics currently running (requires roscore/roslaunch to be running)
