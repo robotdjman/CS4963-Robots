@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "motion_model.py",
-            "cwd": "${workspaceFolder}/mushr_ws/src/localization/test/motion_model.py",
+            "cwd": "${workspaceFolder}/mushr_ws/src/localization/test",
             "console": "integratedTerminal",
             "justMyCode": true
         }
