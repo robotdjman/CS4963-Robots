@@ -4,6 +4,6 @@ build
 devel
 logs
 .DS_Store
-catkin_ws/src
+catkin_ws
 range_libc.egg-info
 range_libc
