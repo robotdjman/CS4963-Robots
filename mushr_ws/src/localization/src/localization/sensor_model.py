@@ -76,19 +76,16 @@ class SingleBeamSensorModel:
 
 
         # Use obs_r and sim_r to vectorize the sensor model precomputation.
-        #diff = sim_r - obs_r
+        diff = sim_r - obs_r
         # BEGIN QUESTION 2.1
-
         # inputs x-axis, y axis
-
-        sig_sqr = self.z_hit ** 2
-        p_hit = (1 / np.sqrt(2 * np.pi * (sig_sqr))) * np.exp(-(np.power(obs_r - sim_r, 2) / 2 * (sig_sqr)))
+        sig_sqr = self.hit_std ** 2
+        p_hit = np.where(abs(diff) > 0, (1 / np.sqrt(2 * np.pi * (sig_sqr))) * np.exp(-(np.power(diff, 2) / (2 * sig_sqr))), 0)
         # Avoid divide by zero error
-        p_short = (obs_r < sim_r) * 2 * (sim_r - obs_r) / (sim_r + 1e-12) / (sim_r + 1e-12)
-        p_max = obs_r == self.z_max
-        p_rand = ((1.0 / self.z_max) if self.z_max > 0 else 0)
-        
-        prob_table[:] = (np.multiply(p_hit, self.z_hit)) + (np.multiply(p_short, self.z_short)) + (np.multiply(p_max, self.z_max)) + (np.multiply(p_rand, self.z_rand))
+        p_short = np.where(obs_r < sim_r, 2 * (sim_r - obs_r) / (sim_r + 1e-12) / (sim_r + 1e-12), 0)
+        p_max = obs_r == max_r
+        p_rand = np.where(obs_r < max_r, (1.0 / max_r),0) if max_r > 0 else 0
+        prob_table = (np.multiply(p_hit, self.z_hit)) + (np.multiply(p_short, self.z_short)) + (np.multiply(p_max, self.z_max)) + (np.multiply(p_rand, self.z_rand))
 
         prob_table /= prob_table.sum(axis=0)
         # END QUESTION 2.1
