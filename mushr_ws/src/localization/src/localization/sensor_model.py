@@ -83,10 +83,12 @@ class SingleBeamSensorModel:
 
         sig_sqr = self.z_hit ** 2
         p_hit = (1 / np.sqrt(2 * np.pi * (sig_sqr))) * np.exp(-(np.power(obs_r - sim_r, 2) / 2 * (sig_sqr)))
-        p_short = 2 * ((obs_r - sim_r) / obs_r)
+        # Avoid divide by zero error
+        p_short = (obs_r < sim_r) * 2 * (sim_r - obs_r) / (sim_r + 1e-12) / (sim_r + 1e-12)
         p_max = obs_r == self.z_max
         p_rand = ((1.0 / self.z_max) if self.z_max > 0 else 0)
-        prob_table[:] = (p_hit * self.z_hit) + (p_short * self.z_short) + (p_max * self.z_max) + (p_rand * self.z_rand)
+        
+        prob_table[:] = (np.multiply(p_hit, self.z_hit)) + (np.multiply(p_short, self.z_short)) + (np.multiply(p_max, self.z_max)) + (np.multiply(p_rand, self.z_rand))
 
         prob_table /= prob_table.sum(axis=0)
         # END QUESTION 2.1
