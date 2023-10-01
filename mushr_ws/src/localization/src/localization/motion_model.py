@@ -77,12 +77,12 @@ class KinematicCarMotionModel:
             # This returns a new matrix with true/false
             items = abs(controls[:, 1]) < delta_threshold
 
-             # Items where control doesn't meet delta_threshold
+            # Items where control doesn't meet delta_threshold
             output[items, 2] = 0
             # Compute dx
-            output[items, 0] = (controls[items, 0] * np.cos(output[items, 1]) * dt)
+            output[items, 0] = (controls[items, 0] * np.cos(states[items, 2]) * dt)
             # Compute dy
-            output[items, 1] = (controls[items, 0] * np.sin(output[items, 1]) * dt)
+            output[items, 1] = (controls[items, 0] * np.sin(states[items, 2]) * dt)
 
             # Items where control does meet delta_threshold
             output[~items, 2] = (controls[~items, 0] / self.car_length) * np.tan(controls[~items, 1]) * dt
@@ -90,23 +90,6 @@ class KinematicCarMotionModel:
             output[~items, 0] = (self.car_length / np.tan(controls[~items, 1]) * (np.sin(output[~items, 2]) - np.sin(states[~items, 2])))
             # Compute dy
             output[~items, 1] = (self.car_length / np.tan(controls[~items, 1]) * (-np.cos(output[~items, 2]) + np.cos(states[~items, 2])))
-
-        # if np.abs(controls[:, 1]) < delta_threshold and dt > 0:
-        #     output[:, 2] = 0
-        #     # Compute dx
-        #     output[:, 0] = (controls[:, 0] * np.cos(output[:, 1]) * dt)
-        #     # Compute dy
-        #     output[:, 1] = (controls[:, 0] * np.sin(output[:, 1]) * dt)
-        
-        # np.where(np.abs(controls[:, 1]) < delta_threshold and dt > 0)
-
-        # if np.abs(controls[:, 1]) >= delta_threshold and dt > 0:
-        #     # Compute dtheta
-        #     output[:, 2] = (controls[:, 0] / self.car_length) * np.tan(controls[:, 1]) * dt
-        #     # Compute dx
-        #     output[:, 0] = (self.car_length / np.tan(controls[:, 1]) * (np.sin(output[:, 2]) - np.sin(states[:, 2])))
-        #     # Compute dy
-        #     output[:, 1] = (self.car_length / np.tan(controls[:, 1]) * (np.cos(output[:, 2]) - np.cos(states[:, 2])))
         return output
         # END QUESTION 1.1
 
@@ -141,21 +124,22 @@ class KinematicCarMotionModel:
         cntrls = np.zeros((n_particles, 2))
 
         # Sample Noise for Velociy M times
-        if vel > 0:
-            cntrls[:, 0] = np.random.normal(vel, self.vel_std ** 2, n_particles)
+        cntrls[:, 0] = np.random.normal(vel, self.vel_std, n_particles)
         # Sample Noise for Steering M times
-        if delta > 0:
-            cntrls[:, 1] = np.random.normal(delta, self.delta_std ** 2, n_particles)
+        cntrls[:, 1] = np.random.normal(delta, self.delta_std, n_particles)
 
-        states[:] = states[:] + self.compute_changes(states, cntrls, dt)
+        states[:] += self.compute_changes(states, cntrls, dt)
         
         # Sample theta
-        states[:, 0] = np.random.normal(states[:, 0], self.x_std ** 2, n_particles)
-        states[:, 1] = np.random.normal(states[:, 1], self.y_std ** 2, n_particles)
-        states[:, 2] = np.random.normal(states[:, 2], self.theta_std ** 2, n_particles)
+        states[:, 0] = np.random.normal(states[:, 0], self.x_std, n_particles)
+        states[:, 1] = np.random.normal(states[:, 1], self.y_std, n_particles)
+        states[:, 2] = np.random.normal(states[:, 2], self.theta_std, n_particles)
 
-        states[states[:, 2] < -1 * np.pi, 2] += 2 * np.pi
-        states[states[:, 2] > np.pi, 2] -= 2 * np.pi
+        #states[states[:, 2] < -1 * np.pi, 2] += 2 * np.pi
+        #states[states[:, 2] > np.pi, 2] -= 2 * np.pi
+        #items = np.mod(states[:, 0], 2 * np.pi) >= 1
+        #states[items, 0] = -np.mod(states[items, 0], 2 * np.pi)
+        #states[~items, 0] = np.mod(states[~items, 0], 2 * np.pi)
         #states[:] = np.mod(output[:, 0], 2 * np.pi)
         # END QUESTION 1.2
 
