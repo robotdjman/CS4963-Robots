@@ -74,10 +74,22 @@ class SingleBeamSensorModel:
         # or the simulated (expected) measurement d (sim_r).
         obs_r, sim_r = np.mgrid[0:table_width, 0:table_width]
 
+
         # Use obs_r and sim_r to vectorize the sensor model precomputation.
-        diff = sim_r - obs_r
+        #diff = sim_r - obs_r
         # BEGIN QUESTION 2.1
-        "*** REPLACE THIS LINE ***"
+
+        # inputs x-axis, y axis
+        def applyFunc(obsr, simr):
+            p_hit = (1 / np.sqrt(2 * np.pi * (self.z_hit ** 2))) * np.exp(-(np.power(obsr - simr, 2) / 2 * (self.z_hit ** 2)))
+            p_short = ((obsr < simr) * (2 * ((obsr - simr) / obsr)))
+            p_max = (obsr == self.z_max)
+            p_rand = (1 / self.z_max)
+            return ((p_hit * self.z_hit) + (p_short * self.z_short) + (p_max * self.z_max) + (p_rand * self.z_rand))
+
+        #prob_table = np.fromfunction(applyFunc, prob_table.shape)
+        # from function is faster: https://stackoverflow.com/questions/6768245/difference-between-frompyfunc-and-vectorize-in-numpy
+        prob_table /= np.fromfunction(applyFunc, prob_table.shape).sum(axis=0)
         # END QUESTION 2.1
 
         return prob_table
