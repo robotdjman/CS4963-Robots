@@ -44,7 +44,10 @@ class ParticleInitializer:
         n_particles = particles.shape[0]
         # Hint: use utils.quaternion_to_angle to compute the orientation theta.
         # BEGIN QUESTION 3.1
-        "*** REPLACE THIS LINE ***"
+        # Read Pose
+        print(msg)
+        #quaternion = 
+        theta = utils.quaternion_to_angle(msg)
         # END QUESTION 3.1
 
 
