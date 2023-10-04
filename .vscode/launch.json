@@ -8,7 +8,7 @@
             "name": "Python: Run Test",
             "type": "python",
             "request": "launch",
-            "program": "sensor_model.py",
+            "program": "particle_initializer.py",
             "cwd": "${workspaceFolder}/mushr_ws/src/localization/test",
             "console": "integratedTerminal",
             "justMyCode": true
