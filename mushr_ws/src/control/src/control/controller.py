@@ -15,8 +15,13 @@ def compute_position_in_frame(p, frame):
         error: p expressed in the new coordinate frame [e_x, e_y]
     """
     # BEGIN QUESTION 1.2
-    "*** REPLACE THIS LINE ***"
-    raise NotImplementedError
+    sub = p[:2] - frame[:2]
+    mtrx = np.array([
+        [np.cos(frame[2]), np.sin(frame[2])],
+        [-np.sin(frame[2]), np.cos(frame[2])]
+        ])
+    val = sub@mtrx
+    return val
     # END QUESTION 1.2
 
 
@@ -77,10 +82,15 @@ class BaseController(object):
             # Hint: compute all the distances from the current state to the
             # path's waypoints. You may find the `argmin` method useful.
             # BEGIN QUESTION 1.1
-            "*** REPLACE THIS LINE ***"
-            raise NotImplementedError
+            next_index = int(np.where(np.all(path_xytv[:, :3] == pose, axis=1))[0]) + 1
+            #look_range = path_xytv[vals[0]:, :]
+            # Calculate euclidean
+            eucl = np.linalg.norm(path_xytv[:, :2] - pose[:2], axis=1)
+            eucl[:next_index] = float("inf")
+            # Chop off larger distances
+            index = eucl.argmin()
             # END QUESTION 1.1
-            return len(path_xytv) - 1
+            return min(index, len(path_xytv) - 1)
 
     def get_error(self, pose, reference_xytv):
         """Compute the error vector.
