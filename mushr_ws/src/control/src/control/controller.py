@@ -86,11 +86,13 @@ class BaseController(object):
             #look_range = path_xytv[vals[0]:, :]
             # Calculate euclidean
             eucl = np.linalg.norm(path_xytv[:, :2] - pose[:2], axis=1)
+            avgDist = np.average(np.linalg.norm(np.diff(path_xytv[:, :2], axis=0), axis=1))
+            # Chop off everything before this position
             eucl[:next_index] = float("inf")
-            # Chop off larger distances
             index = eucl.argmin()
+            index += int(distance_lookahead / avgDist)
             # END QUESTION 1.1
-            return min(index, len(path_xytv) - 1)
+            return index
 
     def get_error(self, pose, reference_xytv):
         """Compute the error vector.
