@@ -8,7 +8,7 @@
             "name": "Python: Run Test",
             "type": "python",
             "request": "launch",
-            "program": "controller.py",
+            "program": "pid.py",
             "cwd": "${workspaceFolder}/mushr_ws/src/control/test",
             "console": "integratedTerminal",
             "justMyCode": true
