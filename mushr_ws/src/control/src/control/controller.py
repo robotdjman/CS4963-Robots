@@ -90,9 +90,16 @@ class BaseController(object):
             # Chop off everything before this position
             index = eucl.argmin()
             # loop through find the closest dist
-            index += int(distance_lookahead / avgDist)
+            # loop ->
+
+            for i, val in enumerate(eucl, index):
+                if(distance_lookahead < val):
+                    return i
+                
+            return eucl.shape - 1
+            #index += int(distance_lookahead / avgDist)
             # END QUESTION 1.1
-            return index
+            #return index
 
     def get_error(self, pose, reference_xytv):
         """Compute the error vector.

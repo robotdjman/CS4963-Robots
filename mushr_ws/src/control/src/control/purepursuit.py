@@ -41,8 +41,9 @@ class PurePursuitController(BaseController):
         # Error in format [Eat, Ect]
         eat = error[0]
         ect = error[1]
-        R = np.sqrt(eat ** 2 + ect ** 2)
-        bottom = 2 * np.sin(np.arctan2(ect, eat))
-        steer = np.arctan(R / bottom)
+        L = np.sqrt(eat ** 2 + ect ** 2)
+        alpha = np.arctan2(ect, eat)
+        R = (L / (2 * np.sin(alpha)))
+        steer = np.arctan(self.car_length / R)
         return np.array([vel, steer])
         # END QUESTION 3.1
