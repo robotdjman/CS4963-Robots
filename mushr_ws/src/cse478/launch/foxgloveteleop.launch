@@ -8,6 +8,7 @@
     <arg name="foxglove_teleop" value = "1" />
     <!-- Set to 1 if you want to use keyboard teleop inputs instead of foxglove teleop -->
     <arg name="keyboard_teleop" value = "0" />
+    <arg name="teleop" default="true"/>
 
     <!-- Start up websocket for docker container foxglove -->
     <group if="$(arg foxglove_teleop)">
@@ -19,7 +20,7 @@
     <!-- We take a map path either as an environment variable or an argument.
          The environment variable has precedence. -->
     <arg name="_env_map" default="$(optenv MAP)" />
-    <arg name="map" default="$(find mushr_sim)/maps/real-floor4_corridor.yaml"/>
+    <arg name="map" default="$(find mushr_sim)/maps/sandbox.yaml"/>
     <arg name="car_name" default="car" />
     <arg name="use_tf_prefix" default="true" />
     <arg name="fake_localization" default="true" />
@@ -53,6 +54,7 @@
 
         <arg name="foxglove_teleop" value="$(arg foxglove_teleop)" />
         <arg name="keyboard_teleop" value="$(arg keyboard_teleop)" />
+        <arg name="teleop" value="$(arg teleop)" />
 
         <arg name="fake_localization" value="$(arg fake_localization)" />
         <arg name="initial_x" value="$(arg initial_x)"/>
