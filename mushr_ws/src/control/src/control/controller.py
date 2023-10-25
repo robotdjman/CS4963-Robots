@@ -82,14 +82,14 @@ class BaseController(object):
             # Hint: compute all the distances from the current state to the
             # path's waypoints. You may find the `argmin` method useful.
             # BEGIN QUESTION 1.1
-            next_index = int(np.where(np.all(path_xytv[:, :3] == pose, axis=1))[0]) + 1
+            #next_index = int(np.where(np.all(path_xytv[:, :3] == pose, axis=1))[0]) + 1
             #look_range = path_xytv[vals[0]:, :]
             # Calculate euclidean
             eucl = np.linalg.norm(path_xytv[:, :2] - pose[:2], axis=1)
             avgDist = np.average(np.linalg.norm(np.diff(path_xytv[:, :2], axis=0), axis=1))
             # Chop off everything before this position
-            eucl[:next_index] = float("inf")
             index = eucl.argmin()
+            # loop through find the closest dist
             index += int(distance_lookahead / avgDist)
             # END QUESTION 1.1
             return index

@@ -22,7 +22,7 @@
     <arg name="_env_map" default="$(optenv MAP)" />
     <arg name="map" default="$(find mushr_sim)/maps/sandbox.yaml"/>
     <arg name="car_name" default="car" />
-    <arg name="use_tf_prefix" default="true" />
+    <arg name="use_tf_prefix" default="false" />
     <arg name="fake_localization" default="true" />
     <arg name="initial_x" default="0"/>
     <arg name="initial_y" default="0"/>
