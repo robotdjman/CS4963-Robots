@@ -20,8 +20,9 @@ def compute_position_in_frame(p, frame):
         [np.cos(frame[2]), np.sin(frame[2])],
         [-np.sin(frame[2]), np.cos(frame[2])]
         ])
-    val = sub@mtrx
-    return val
+    diff = sub.reshape((2,1))
+    val = mtrx@diff
+    return val.reshape((2,))
     # END QUESTION 1.2
 
 
@@ -92,11 +93,12 @@ class BaseController(object):
             # loop through find the closest dist
             # loop ->
 
-            for i, val in enumerate(eucl, index):
-                if(distance_lookahead < val):
+            for i in range(index, len(eucl)):
+                val = eucl[i]
+                if(self.distance_lookahead < val):
                     return i
                 
-            return eucl.shape - 1
+            return len(eucl) - 1
             #index += int(distance_lookahead / avgDist)
             # END QUESTION 1.1
             #return index
