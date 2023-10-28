@@ -38,3 +38,4 @@ under XQuartz Preferences (You can get to this via the top mac nav bar with xqua
 
 ## Useful Links
 https://github.com/prl-mushr/mushr_pf/blob/master/src/mushr_pf/motion_model.py
+https://github.com/prl-mushr/mushr_control/blob/master/src/purepursuit.py

@@ -62,8 +62,9 @@ class ModelPredictiveController(BaseController):
         # sampled steering angles, and NumPy array broadcasting useful for
         # putting the sampled steering angles into controls.
         # BEGIN QUESTION 4.1
-        "*** REPLACE THIS LINE ***"
-        raise NotImplementedError
+        for item in range(0, self.T):
+            controls[:, item, 1] = np.linspace(self.min_delta, self.max_delta, self.K)
+        
         # END QUESTION 4.1
         return controls
 

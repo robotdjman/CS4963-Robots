@@ -93,13 +93,14 @@ class BaseController(object):
             # loop through find the closest dist
             # loop ->
 
-            for i in range(index, len(eucl)):
-                val = eucl[i]
-                if(self.distance_lookahead < val):
-                    return i
+            # for i in range(index, len(eucl)):
+            #     val = eucl[i]
+            #     if(self.distance_lookahead < val):
+            #         return i
                 
-            return len(eucl) - 1
-            #index += int(distance_lookahead / avgDist)
+            #return len(eucl) - 1
+            index += int(distance_lookahead / avgDist)
+            return min(index, len(eucl) - 1)
             # END QUESTION 1.1
             #return index
 
