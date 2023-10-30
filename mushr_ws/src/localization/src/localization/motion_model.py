@@ -130,16 +130,17 @@ class KinematicCarMotionModel:
 
         states[:] += self.compute_changes(states, cntrls, dt)
         
-        # Sample theta
+        # Sample noisey states
         states[:, 0] = np.random.normal(states[:, 0], self.x_std, n_particles)
         states[:, 1] = np.random.normal(states[:, 1], self.y_std, n_particles)
         states[:, 2] = np.random.normal(states[:, 2], self.theta_std, n_particles)
 
-        #states[states[:, 2] < -1 * np.pi, 2] += 2 * np.pi
-        #states[states[:, 2] > np.pi, 2] -= 2 * np.pi
-        #items = np.mod(states[:, 0], 2 * np.pi) >= 1
-        #states[items, 0] = -np.mod(states[items, 0], 2 * np.pi)
-        #states[~items, 0] = np.mod(states[~items, 0], 2 * np.pi)
+        # Limit
+        states[states[:, 2] < -np.pi, 2] += 2 * np.pi
+        states[states[:, 2] > np.pi, 2] -= 2 * np.pi
+        #items = np.mod(states[:, 2], 2 * np.pi) >= 1
+        #states[items, 2] = -np.mod(states[items, 2], 2 * np.pi)
+        #states[~items, 2] = np.mod(states[~items, 2], 2 * np.pi)
         #states[:] = np.mod(output[:, 0], 2 * np.pi)
         # END QUESTION 1.2
 
