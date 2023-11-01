@@ -87,9 +87,11 @@ class KinematicCarMotionModel:
             # Items where control does meet delta_threshold
             output[~items, 2] = (controls[~items, 0] / self.car_length) * np.tan(controls[~items, 1]) * dt
             # Compute dx
-            output[~items, 0] = (self.car_length / np.tan(controls[~items, 1]) * (np.sin(output[~items, 2]) - np.sin(states[~items, 2])))
+
+            new_theta = output[~items, 2] + states[~items, 2]
+            output[~items, 0] = (self.car_length / np.tan(controls[~items, 1]) * (np.sin(new_theta) - np.sin(states[~items, 2])))
             # Compute dy
-            output[~items, 1] = (self.car_length / np.tan(controls[~items, 1]) * (-np.cos(output[~items, 2]) + np.cos(states[~items, 2])))
+            output[~items, 1] = (self.car_length / np.tan(controls[~items, 1]) * (-np.cos(new_theta) + np.cos(states[~items, 2])))
         return output
         # END QUESTION 1.1
 

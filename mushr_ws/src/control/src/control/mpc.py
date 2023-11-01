@@ -99,10 +99,11 @@ class ModelPredictiveController(BaseController):
 
         # BEGIN QUESTION 4.2
         # for each T, vectorize across all K
-        for item in range(0, self.T):
+        for item in range(1, self.T + 1):
             prevState = rollouts[:, item - 1]
-            prevSmplCtrl = self.sampled_controls[:, item - 1]
-            rollouts[:, item] = self.motion_model.compute_changes(prevState, prevSmplCtrl, 1)
+            prevSmplCtrl = controls[:, item - 1]
+            changes = self.motion_model.compute_changes(prevState, prevSmplCtrl, dt)
+            rollouts[:, item] = prevState + changes
         # END QUESTION 4.2
         return rollouts
 
@@ -120,13 +121,14 @@ class ModelPredictiveController(BaseController):
             costs: np.array of cost with shape K (one value for each rollout)
         """
         assert rollouts.shape == (self.K, self.T + 1, 3)
+        output = np.zeros(self.K)
 
         # Note: the distance is the norm of the difference between the x- and y-
         # coordinate of the final rollout state, and the x- and y- coordinate of
         # the reference state
         # BEGIN QUESTION 4.3
-        "*** REPLACE THIS LINE ***"
-        raise NotImplementedError
+        output[:] = np.linalg.norm(rollouts[:, self.T, :2] - reference_xyt[:2]) * self.error_w
+        return output
         # END QUESTION 4.3
 
     def compute_collision_cost(self, rollouts, _):
