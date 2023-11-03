@@ -2,6 +2,12 @@
 
 - I didn't run the `source catkin_ws/devel/setup.bash` command since following the MuSHR Foxglove docks didn't build it that way
 
+## Setup
+
+- Confirm XQuarts Setup (check below)
+- Open VSCode in container
+- You make need to run `catkin clean` then `catkin build` in both the mushr_ws and the dependencies_ws folders as the catkin does some stuff to the container
+
 ## Running muSHR Visualization
 - Run `mushr_noetic` in your shell
 - Run `source ~/.bashrc` in the container shell

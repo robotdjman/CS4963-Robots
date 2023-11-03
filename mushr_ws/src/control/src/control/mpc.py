@@ -157,8 +157,11 @@ class ModelPredictiveController(BaseController):
         # need one call to check_collisions_in_map.
 
         # BEGIN QUESTION 4.3
-        "*** REPLACE THIS LINE ***"
-        raise NotImplementedError
+        abs = np.reshape(rollouts, ((self.K * self.T) + 1, 3))
+        collisions = self.check_collisions_in_map(abs)
+        reshaped = collisions.reshape(self.K, self.T + 1)
+        total = reshaped.sum(axis=1) * self.collision_w
+        return total
         # END QUESTION 4.3
 
     def compute_rollout_cost(self, rollouts, reference_xyt):
