@@ -205,12 +205,12 @@ class ModelPredictiveController(BaseController):
         self.sampled_controls[:, :, 0] = reference_xytv[3]
 
         # BEGIN QUESTION 4.4
-        "*** REPLACE THIS LINE ***"
-        rollouts = np.zeros((self.K, self.T + 1, 3))
+        #rollouts = np.zeros((self.K, self.T + 1, 3))
+        rollouts = self.get_rollout(pose, self.sample_controls())
         # END QUESTION 4.4
         # BEGIN QUESTION 4.4
-        "*** REPLACE THIS LINE ***"
-        costs = np.zeros(self.K)
+        #costs = np.zeros(self.K)
+        costs = self.compute_distance_cost(rollouts, reference_xytv) + self.compute_distance_cost(rollouts, reference_xytv)
         # END QUESTION 4.4
 
         # Set the controller's rollouts and costs (for visualization purposes).
@@ -221,8 +221,7 @@ class ModelPredictiveController(BaseController):
         # Hint: you may find the np.argmin function useful. Note that the
         # reference velocity has already been stored in self.sampled_controls.
         # BEGIN QUESTION 4.4
-        "*** REPLACE THIS LINE ***"
-        raise NotImplementedError
+        return self.rollouts[np.argmin(costs), 0]
         # END QUESTION 4.4
 
 
