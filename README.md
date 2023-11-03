@@ -7,6 +7,7 @@
 - Confirm XQuarts Setup (check below)
 - Open VSCode in container
 - You make need to run `catkin clean` then `catkin build` in both the mushr_ws and the dependencies_ws folders as the catkin does some stuff to the container
+- Navigate to `rangelib_c/pywrapper` and run `sudo python setup.py install` (must be sudo)
 
 ## Running muSHR Visualization
 - Run `mushr_noetic` in your shell
