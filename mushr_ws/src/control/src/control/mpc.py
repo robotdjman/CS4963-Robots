@@ -127,7 +127,7 @@ class ModelPredictiveController(BaseController):
         # coordinate of the final rollout state, and the x- and y- coordinate of
         # the reference state
         # BEGIN QUESTION 4.3
-        output[:] = np.linalg.norm(rollouts[:, self.T, :2] - reference_xyt[:2]) * self.error_w
+        output[:] = np.linalg.norm(rollouts[:, self.T, :2] - reference_xyt[:2], axis=1) * self.error_w
         return output
         # END QUESTION 4.3
 
@@ -157,10 +157,10 @@ class ModelPredictiveController(BaseController):
         # need one call to check_collisions_in_map.
 
         # BEGIN QUESTION 4.3
-        abs = np.reshape(rollouts, ((self.K * self.T) + 1, 3))
-        collisions = self.check_collisions_in_map(abs)
+        newarr = np.reshape(rollouts, (self.K * (self.T + 1), 3))
+        collisions = self.check_collisions_in_map(newarr)
         reshaped = collisions.reshape(self.K, self.T + 1)
-        total = reshaped.sum(axis=1) * self.collision_w
+        total = np.sum(reshaped * self.collision_w, axis=1)
         return total
         # END QUESTION 4.3
 
@@ -206,11 +206,11 @@ class ModelPredictiveController(BaseController):
 
         # BEGIN QUESTION 4.4
         #rollouts = np.zeros((self.K, self.T + 1, 3))
-        rollouts = self.get_rollout(pose, self.sample_controls())
+        rollouts = self.get_rollout(pose, self.sampled_controls)
         # END QUESTION 4.4
         # BEGIN QUESTION 4.4
         #costs = np.zeros(self.K)
-        costs = self.compute_distance_cost(rollouts, reference_xytv) + self.compute_distance_cost(rollouts, reference_xytv)
+        costs = self.compute_rollout_cost(rollouts, reference_xytv)
         # END QUESTION 4.4
 
         # Set the controller's rollouts and costs (for visualization purposes).
@@ -221,7 +221,7 @@ class ModelPredictiveController(BaseController):
         # Hint: you may find the np.argmin function useful. Note that the
         # reference velocity has already been stored in self.sampled_controls.
         # BEGIN QUESTION 4.4
-        return self.rollouts[np.argmin(costs), 0]
+        return self.sampled_controls[np.argmin(costs), 0]
         # END QUESTION 4.4
 
 
