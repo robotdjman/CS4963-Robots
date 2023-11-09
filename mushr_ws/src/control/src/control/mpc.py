@@ -207,7 +207,7 @@ class ModelPredictiveController(BaseController):
         # BEGIN QUESTION 4.4
         #rollouts = np.zeros((self.K, self.T + 1, 3))
         rollouts = self.get_rollout(pose, self.sampled_controls)
-        # END QUESTION 4.4
+        # END QUESTION 4.4x
         # BEGIN QUESTION 4.4
         #costs = np.zeros(self.K)
         costs = self.compute_rollout_cost(rollouts, reference_xytv)
