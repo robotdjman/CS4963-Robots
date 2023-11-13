@@ -8,8 +8,8 @@
             "name": "Python: Run Test",
             "type": "python",
             "request": "launch",
-            "program": "mpc.py",
-            "cwd": "${workspaceFolder}/mushr_ws/src/control/test",
+            "program": "problems.py",
+            "cwd": "${workspaceFolder}/mushr_ws/src/planning/test",
             "console": "integratedTerminal",
             "justMyCode": true
         }

@@ -43,10 +43,17 @@ class PlanarProblem(object):
         x = states[:, 0]
         y = states[:, 1]
         valid = np.ones_like(x, dtype=bool)  # feel free to delete this line
+        #validityMtrx = np.zeros_like(states)
 
         # Check that x and y are within the extents of the map.
         # BEGIN QUESTION 1.2
-        "*** REPLACE THIS LINE ***"
+        # Check X Validity
+        xMin, xMax = self.extents[0]
+        yMin, yMax = self.extents[1]
+        xvals = (xMax >= x) | (x >= xMin)
+        yvals = (yMax >= y) | (y >= yMin)
+        valid[:] = yvals[:] & xvals[:]
+        
         # END QUESTION 1.2
 
         # The units of the state are meters and radians. We need to convert the
@@ -64,7 +71,7 @@ class PlanarProblem(object):
         # integers. Then, index into self.permissible_region, remembering that
         # the zeroth dimension is the height.
         # BEGIN QUESTION 1.2
-        "*** REPLACE THIS LINE ***"
+        valid[:] = self.permissible_region[x[:].astype(int), y[:].astype(int)]
         # END QUESTION 1.2
 
         # Convert the units back from pixels to meters for the caller
