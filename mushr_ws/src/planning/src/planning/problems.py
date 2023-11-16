@@ -50,10 +50,10 @@ class PlanarProblem(object):
         # Check X Validity
         xMin, xMax = self.extents[0]
         yMin, yMax = self.extents[1]
-        xvals = (xMax >= x) | (x >= xMin)
-        yvals = (yMax >= y) | (y >= yMin)
-        valid[:] = yvals[:] & xvals[:]
-        
+        xvals = (xMax <= x) | (x < xMin)
+        yvals = (yMax <= y) | (y < yMin)
+        #valid[:] = np.invert((yvals[:] | xvals[:]))
+        valid[:] = np.invert((yvals[:] | xvals[:]))
         # END QUESTION 1.2
 
         # The units of the state are meters and radians. We need to convert the
@@ -71,7 +71,9 @@ class PlanarProblem(object):
         # integers. Then, index into self.permissible_region, remembering that
         # the zeroth dimension is the height.
         # BEGIN QUESTION 1.2
-        valid[:] = self.permissible_region[x[:].astype(int), y[:].astype(int)]
+
+        # Get valid positions and normalize them
+        valid[valid] = self.permissible_region[y[valid].astype(int), x[valid].astype(int)] & valid[valid]
         # END QUESTION 1.2
 
         # Convert the units back from pixels to meters for the caller
