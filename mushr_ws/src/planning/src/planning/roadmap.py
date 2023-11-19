@@ -93,10 +93,22 @@ class Roadmap(object):
         """
         # Hint: call the check_edge_validity method from above.
         # BEGIN QUESTION 1.3
-        "*** REPLACE THIS LINE ***"
-        raise NotImplementedError
+        mask = np.zeros_like(weighted_edges)
+        # for node, index in weighted_edges:
+        #     u,v,len = node
+        #     if(self.check_edge_validity(int(u), int(v))):
+        #         newlist.append(node)
+
+        # Vectorized Version
+        vectorFunc = np.vectorize(self.check_edge_validity, otypes=[int])
+        #res = vectorFunc(weighted_edges[:, :1].astype(int), weighted_edges[:, 1:2].astype(int))
+        mask = self.check_edge_validity(weighted_edges[:, :1].astype(int), weighted_edges[:, 1:2].astype(int))
+        result = weighted_edges[mask]
+
+        #mask = self.check_edge_validity(weighted_edges[:, :1].astype(int), weighted_edges[:, 1:2].astype(int))
+        #result = weighted_edges[mask]
         # END QUESTION 1.3
-        return weighted_edges
+        return result
 
     def construct(self):
         """Construct the roadmap.

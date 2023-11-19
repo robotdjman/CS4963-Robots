@@ -8,7 +8,7 @@
             "name": "Python: Run Test",
             "type": "python",
             "request": "launch",
-            "program": "problems.py",
+            "program": "roadmap.py",
             "cwd": "${workspaceFolder}/mushr_ws/src/planning/test",
             "console": "integratedTerminal",
             "justMyCode": true
