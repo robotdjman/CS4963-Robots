@@ -93,20 +93,23 @@ class Roadmap(object):
         """
         # Hint: call the check_edge_validity method from above.
         # BEGIN QUESTION 1.3
-        mask = np.zeros_like(weighted_edges)
-        # for node, index in weighted_edges:
+        mask = np.zeros((weighted_edges.shape[0],), dtype=bool)
+        # it = np.nditer(weighted_edges)
+        # for node in it:
         #     u,v,len = node
         #     if(self.check_edge_validity(int(u), int(v))):
-        #         newlist.append(node)
+        #         mask[it.index] = True
 
-        # Vectorized Version
-        vectorFunc = np.vectorize(self.check_edge_validity, otypes=[int])
-        #res = vectorFunc(weighted_edges[:, :1].astype(int), weighted_edges[:, 1:2].astype(int))
-        mask = self.check_edge_validity(weighted_edges[:, :1].astype(int), weighted_edges[:, 1:2].astype(int))
-        result = weighted_edges[mask]
+        # # Vectorized Version
+        # vectorFunc = np.vectorize(self.check_edge_validity, otypes=[int])
+        # res = vectorFunc(weighted_edges[:, :1].astype(int), weighted_edges[:, 1:2].astype(int))
+        u = weighted_edges[:, :1].astype(int)
+        v = weighted_edges[:, 1:2].astype(int)
+        for i in range(weighted_edges.shape[0]):
+            mask[i] = self.check_edge_validity(u[i], v[i])
 
         #mask = self.check_edge_validity(weighted_edges[:, :1].astype(int), weighted_edges[:, 1:2].astype(int))
-        #result = weighted_edges[mask]
+        result = weighted_edges[mask]
         # END QUESTION 1.3
         return result
 
