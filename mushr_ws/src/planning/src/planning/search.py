@@ -141,8 +141,22 @@ def shortcut(rm, vpath, num_trials=100):
         indices = np.random.choice(len(vpath), size=2, replace=False)
         i, j = np.sort(indices)
         # BEGIN QUESTION 2.3
-        "*** REPLACE THIS LINE ***"
-        raise NotImplementedError
+        # Don't bother if the indices are right next to each-other
+        if abs(i-j) < 2:
+            continue
+        # Check validity of edge
+        u = vpath[i]
+        v = vpath[j]
+        if not rm.check_edge_validity(u, v):
+            continue
+        # Compute new and previous path lengths
+        newvPath = np.delete(vpath, np.s_[i + 1, j - 1], axis=0)
+        newLen = rm.compute_path_length(newvPath)
+        prevLen = rm.compute_path_length(vpath)
+        # Is this better then what we already have?
+        if newLen < prevLen:
+            # set array equal to a subset where nodes between u and v are cut out
+            vpath = newvPath
         # END QUESTION 2.3
     return vpath
 
