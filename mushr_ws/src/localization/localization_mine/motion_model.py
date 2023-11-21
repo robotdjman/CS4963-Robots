@@ -55,37 +55,45 @@ class KinematicCarMotionModel:
         orientation component of state) does not change in this case.
 
         Args:
-            states: np.array of states with shape M x 3
-            controls: np.array of controls with shape M x 2
+            states: np.array of states with shape M x 3 (X , Y , Theta)
+            controls: np.array of controls with shape M x 2 (v, S) (Velocity, Steering Angle)
             dt (float): control duration
             delta_threshold (float): steering angle threshold
 
         Returns:
             M x 3 np.array, where the three columns are dx, dy, dtheta
         """
-        # BEGIN SOLUTION "QUESTION 1.1" ALT="return np.zeros_like(states, dtype=float)"
-        changes = np.empty_like(states, dtype=float)
-        vel, delta = controls[:, 0], controls[:, 1]
-        theta = states[:, 2]
+        # BEGIN QUESTION 1.1
+        # State is x , y, theta
+        # Control is V, S
+        # M = amount of particles
 
-        changes[:, 2] = (vel / self.car_length) * np.tan(delta) * dt
-        changes[np.abs(delta) < delta_threshold, 2] = 0
-        dtheta = changes[:, 2]
-        changes[:, 0] = vel * np.cos(theta) * dt
-        changes[:, 1] = vel * np.sin(theta) * dt
+        # For each state and corresponding control, apply 
+        # the selected function (determined by delta_thresh)
+        # and return the new positions
+        output = np.zeros_like(states, dtype=float)
 
-        val_indices = np.abs(delta) >= delta_threshold
-        val_theta = theta[val_indices]
-        val_new_theta = val_theta + dtheta[val_indices]
-        share_value = self.car_length / np.tan(delta[val_indices])
-        changes[val_indices, 0] = share_value * (
-            np.sin(val_new_theta) - np.sin(val_theta)
-        )
-        changes[val_indices, 1] = share_value * (
-            np.cos(val_theta) - np.cos(val_new_theta)
-        )
-        return changes
-        # END SOLUTION
+        if dt > 0:
+            # This returns a new matrix with true/false
+            items = abs(controls[:, 1]) < delta_threshold
+
+            # Items where control doesn't meet delta_threshold
+            output[items, 2] = 0
+            # Compute dx
+            output[items, 0] = (controls[items, 0] * np.cos(states[items, 2]) * dt)
+            # Compute dy
+            output[items, 1] = (controls[items, 0] * np.sin(states[items, 2]) * dt)
+
+            # Items where control does meet delta_threshold
+            output[~items, 2] = (controls[~items, 0] / self.car_length) * np.tan(controls[~items, 1]) * dt
+            # Compute dx
+
+            new_theta = output[~items, 2] + states[~items, 2]
+            output[~items, 0] = (self.car_length / np.tan(controls[~items, 1]) * (np.sin(new_theta) - np.sin(states[~items, 2])))
+            # Compute dy
+            output[~items, 1] = (self.car_length / np.tan(controls[~items, 1]) * (-np.cos(new_theta) + np.cos(states[~items, 2])))
+        return output
+        # END QUESTION 1.1
 
     def apply_motion_model(self, states, vel, delta, dt):
         """Propagate states through the noisy kinematic car motion model.
@@ -111,25 +119,32 @@ class KinematicCarMotionModel:
         n_particles = states.shape[0]
 
         # Hint: you may find the np.random.normal function useful
-        # BEGIN SOLUTION "QUESTION 1.2"
-        controls = np.random.normal(
-            np.array([vel, delta]),
-            scale=[self.vel_std, self.delta_std],
-            size=(n_particles, 2),
-        )
-        changes = self.compute_changes(states, controls, dt)
-        changes = np.random.normal(
-            changes, scale=(self.x_std, self.y_std, self.theta_std)
-        )
+        # BEGIN QUESTION 1.2
 
-        # Apply the change in-place (numpy += is in-place)
-        states += changes
+        # Create control np array that holds velocity and steering angle
+        # Shape is M * 2
+        cntrls = np.zeros((n_particles, 2))
 
-        # First, normalize to [-pi, pi)
-        states[:, 2] = (states[:, 2] + np.pi) % (2 * np.pi) - np.pi
-        # Now fix to (-pi, pi]
-        states[states[:, 2] == -np.pi, 2] = np.pi
-        # END SOLUTION
+        # Sample Noise for Velociy M times
+        cntrls[:, 0] = np.random.normal(vel, self.vel_std, n_particles)
+        # Sample Noise for Steering M times
+        cntrls[:, 1] = np.random.normal(delta, self.delta_std, n_particles)
+
+        states[:] += self.compute_changes(states, cntrls, dt)
+        
+        # Sample noisey states
+        states[:, 0] = np.random.normal(states[:, 0], self.x_std, n_particles)
+        states[:, 1] = np.random.normal(states[:, 1], self.y_std, n_particles)
+        states[:, 2] = np.random.normal(states[:, 2], self.theta_std, n_particles)
+
+        # Limit
+        states[states[:, 2] < -np.pi, 2] += 2 * np.pi
+        states[states[:, 2] > np.pi, 2] -= 2 * np.pi
+        #items = np.mod(states[:, 2], 2 * np.pi) >= 1
+        #states[items, 2] = -np.mod(states[items, 2], 2 * np.pi)
+        #states[~items, 2] = np.mod(states[~items, 2], 2 * np.pi)
+        #states[:] = np.mod(output[:, 0], 2 * np.pi)
+        # END QUESTION 1.2
 
 
 class KinematicCarMotionModelROS:

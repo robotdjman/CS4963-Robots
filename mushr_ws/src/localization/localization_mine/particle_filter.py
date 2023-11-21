@@ -19,9 +19,9 @@ from tf_conversions import transformations
 from nav_msgs.srv import GetMap
 
 from cse478 import utils
-from localization.motion_model import KinematicCarMotionModelROS
-from localization.sensor_model import LaserScanSensorModelROS
-from localization.resampler import LowVarianceSampler
+from localization_mine.motion_model import KinematicCarMotionModelROS
+from localization_mine.sensor_model import LaserScanSensorModelROS
+from localization_mine.resampler import LowVarianceSampler
 
 
 class ParticleInitializer:
@@ -30,7 +30,7 @@ class ParticleInitializer:
         self.y_std = y_std
         self.theta_std = theta_std
 
-    def reset_click_pose(self, msg, particles, weights):
+    def reset_click_pose(self, msg: Pose, particles, weights):
         """Initialize the particles and weights in-place.
 
         The particles should be sampled from a Gaussian distribution around the
@@ -43,17 +43,16 @@ class ParticleInitializer:
         """
         n_particles = particles.shape[0]
         # Hint: use utils.quaternion_to_angle to compute the orientation theta.
-        # BEGIN SOLUTION "QUESTION 3.1"
+        # BEGIN QUESTION 3.1
+        # Read Pose
         theta = utils.quaternion_to_angle(msg.orientation)
-        x = msg.position.x
-        y = msg.position.y
-        particles[:] = np.random.normal(
-            [x, y, theta],
-            scale=[self.x_std, self.y_std, self.theta_std],
-            size=(n_particles, 3),
-        )
-        weights.fill(1.0 / n_particles)
-        # END SOLUTION
+
+        particles[:, 0] = np.random.normal(msg.position.x, weights[0], n_particles)
+        particles[:, 1] = np.random.normal(msg.position.y, weights[1], n_particles)
+        particles[:, 2] = np.random.normal(theta, weights[2], n_particles)
+
+        weights.fill(1/n_particles)
+        # END QUESTION 3.1
 
 
 class ParticleFilter:
@@ -85,6 +84,7 @@ class ParticleFilter:
         """
         required_keyword_args = {
             "publish_tf",
+            "tf_prefix",
             "n_particles",
             "n_viz_particles",
             "car_length",
@@ -102,7 +102,6 @@ class ParticleFilter:
             raise ValueError("A required keyword argument is missing")
         self.__dict__.update(kwargs)
         self.n_particles = self.n_particles
-
         # Cached list of particle indices
         self.particle_indices = np.arange(self.n_particles)
         # Numpy matrix of dimension N_PARTICLES x 3
@@ -140,10 +139,6 @@ class ParticleFilter:
         # Publishes the path of the car
         self.pub_odom = rospy.Publisher("~odom", Odometry, queue_size=1)
 
-        # BEGIN SOLUTION NO PROMPT
-        # Globally initialize the particles
-        # self.initialize_global_particles()
-        # END SOLUTION
 
         # Outside caller can use this resampler to resample particles
         self.resampler = LowVarianceSampler(
@@ -256,7 +251,7 @@ class ParticleFilter:
         # Offset to car's center of mass
         position[0] += (self.car_length / 2) * np.cos(theta)
         position[1] += (self.car_length / 2) * np.sin(theta)
-        return np.array((position[0], position[1], theta), dtype=np.float64)
+        return np.array((position[0], position[1], theta), dtype=np.float)
 
     def clicked_pose_cb(self, msg):
         """Reinitialize particles and weights according to the received initial pose.
@@ -345,7 +340,7 @@ class ParticleFilter:
             try:
                 # Look up the transform between laser and odom
                 odom_to_laser = self._tf_buffer.lookup_transform(
-                    "laser_link", "odom", rospy.Time(0)
+                    self.tf_prefix + "laser_link", self.tf_prefix + "odom", rospy.Time(0)
                 )
             except tf2_ros.LookupException as e:  # Will occur if odom frame does not exist
                 rospy.logerr(str(e))
@@ -362,7 +357,7 @@ class ParticleFilter:
             transform = TransformStamped()
             transform.header.stamp = pose.header.stamp
             transform.header.frame_id = "map"
-            transform.child_frame_id = "odom"
+            transform.child_frame_id = self.tf_prefix + "odom"
             transform.transform.translation.x = pa[0] + off_x
             transform.transform.translation.y = pa[1] + off_y
             transform.transform.translation.z = 0
@@ -377,43 +372,3 @@ class ParticleFilter:
             # Broadcast the transform
             self.tf_broadcaster.sendTransform(transform)
 
-    # BEGIN SOLUTION NO PROMPT
-    def initialize_global_particles(self):
-        """Initialize the particles to cover the permissible regions."""
-        permissible_x, permissible_y = np.where(self.permissible_region == 1)
-
-        # The number of particles at each location, each with different rotation
-        angle_step = 4
-
-        # The sample interval for permissible states
-        permissible_step = int(
-            angle_step * len(permissible_x) / self.particles.shape[0]
-        )
-
-        # Indices of permissible states to use
-        indices = np.arange(0, len(permissible_x), permissible_step)
-        indices = indices[: (self.particles.shape[0] // angle_step)]
-
-        # Proxy for the new particles
-        permissible_states = np.zeros((self.particles.shape[0], 3))
-
-        # Loop through permissible states, each iteration drawing particles with
-        # different rotation
-        for i in range(angle_step):
-            idx_start = i * (self.particles.shape[0] // angle_step)
-            idx_end = (i + 1) * (self.particles.shape[0] // angle_step)
-
-            permissible_states[idx_start:idx_end, 0] = permissible_y[indices]
-            permissible_states[idx_start:idx_end, 1] = permissible_x[indices]
-            permissible_states[idx_start:idx_end, 2] = i * (2 * np.pi / angle_step)
-
-        # Transform permissible states to be w.r.t world
-        utils.map_to_world(permissible_states, self.map_info)
-
-        with self.state_lock:
-            # Reset particles and weights
-            self.particles[:, :] = permissible_states[:, :]
-            self.weights[:] = 1.0 / self.particles.shape[0]
-            # self.publish_particles(self.particles)
-
-    # END SOLUTION

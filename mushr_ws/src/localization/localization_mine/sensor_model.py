@@ -74,24 +74,21 @@ class SingleBeamSensorModel:
         # or the simulated (expected) measurement d (sim_r).
         obs_r, sim_r = np.mgrid[0:table_width, 0:table_width]
 
+
         # Use obs_r and sim_r to vectorize the sensor model precomputation.
         diff = sim_r - obs_r
-        # BEGIN SOLUTION "QUESTION 2.1"
-        if self.hit_std > 0:
-            prob_table += (
-                self.z_hit
-                * np.exp(-0.5 * (diff / self.hit_std) ** 2)
-                / (self.hit_std * np.sqrt(2.0 * np.pi))
-            )
+        # BEGIN QUESTION 2.1
+        # inputs x-axis, y axis
+        sig_sqr = self.hit_std ** 2
+        p_hit = np.where(abs(diff) > 0, (1 / np.sqrt(2 * np.pi * (sig_sqr))) * np.exp(-(np.power(diff, 2) / (2 * sig_sqr))), 0)
+        # Avoid divide by zero error
+        p_short = np.where(obs_r < sim_r, 2 * (sim_r - obs_r) / (sim_r + 1e-12) / (sim_r + 1e-12), 0)
+        p_max = obs_r == max_r
+        p_rand = np.where(obs_r < max_r, (1.0 / max_r),0) if max_r > 0 else 0
+        prob_table = (np.multiply(p_hit, self.z_hit)) + (np.multiply(p_short, self.z_short)) + (np.multiply(p_max, self.z_max)) + (np.multiply(p_rand, self.z_rand))
 
-        prob_table[obs_r < sim_r] += (
-            self.z_short * (2 * diff[obs_r < sim_r]) / sim_r[obs_r < sim_r]
-        )
-        prob_table[obs_r == max_r] += self.z_max
-        prob_table[obs_r < max_r] += np.true_divide(self.z_rand, max_r)
-
-        prob_table /= prob_table.sum(axis=0, keepdims=True)
-        # END SOLUTION
+        prob_table /= prob_table.sum(axis=0)
+        # END QUESTION 2.1
 
         return prob_table
 
@@ -278,13 +275,8 @@ class LaserScanSensorModelROS:
         ray_count = int(self.laser_angles.shape[0] / self.laser_ray_step)
         num_valid = filtered_angles.shape[0]
         sample_indices = np.arange(0, num_valid, float(num_valid) / ray_count).astype(
-            np.int64
+            np.int
         )
-        # BEGIN SOLUTION NO PROMPT
-        # self.downsampled_angles = np.zeros(ray_count + 1, dtype=np.float32) # TODO Why plus 1?
-        # self.downsampled_ranges = np.zeros(ray_count + 1, dtype=np.float32) # If this works, remove these lines
-        # self.downsampled_angles[:sample_indices.shape[0]] = np.copy(...)
-        # END SOLUTION
         angles = np.copy(filtered_angles[sample_indices]).astype(np.float32)
         ranges = np.copy(filtered_ranges[sample_indices]).astype(np.float32)
         return ranges, angles

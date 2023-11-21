@@ -24,11 +24,6 @@ class LowVarianceSampler:
         self.n_particles = particles.shape[0]
 
         # You may want to cache some intermediate variables here for efficiency
-        # BEGIN SOLUTION NO PROMPT
-        self.step_array = np.arange(self.n_particles, dtype=np.float32)
-        self.step_array /= self.n_particles
-        self.indices = np.zeros(self.n_particles, dtype=int)
-        # END SOLUTION
 
     def resample(self):
         """Resample particles using the low-variance sampling scheme.
@@ -43,26 +38,18 @@ class LowVarianceSampler:
         # See the Python documentation for more information:
         # https://docs.python.org/3/library/threading.html#using-locks-conditions-and-semaphores-in-the-with-statement
         with self.state_lock:
-            # BEGIN SOLUTION "QUESTION 3.2"
-            # Choose an initial value from half open interval [0, 1/M)
-            initval = np.random.uniform(0, self.n_particles ** -1)
+            # BEGIN QUESTION 3.2
+            m_samples = self.particles.shape[0]
+            smples = 1 / m_samples
+            #res = np.searchsorted([1,2,3,4,5], [-10, 10, 2, 3])
+            new_particles = np.zeros_like(self.particles)
+            norm_weights = self.weights / np.sum(self.weights)
+            buckets = np.cumsum(norm_weights)
+            r = np.random.uniform(0, smples)
+            random_vars = (smples * np.arange(m_samples)) + r
 
-            # Get the bin partitions
-            bin_parts = initval + self.step_array
-            # The last and highest value in bin_parts = r + 1 - (1/M)
-            # where r in [0, 1/M)
-
-            # Get the cumulative sum of the weights. Notice how the
-            # the space between entries is an interval proportional to
-            # the weight of the particle at that index
-            cum_weights = np.cumsum(self.weights)
-
-            # Concise O(M log M) implementation
-            self.indices = np.searchsorted(cum_weights, bin_parts, side="left")
-
-            assert np.all(self.indices < self.n_particles)
-            self.particles[:] = self.particles[self.indices, :]
-
-            # Uniformly weight new particles
-            self.weights.fill(1.0 / self.n_particles)
-            # END SOLUTION
+            items = np.searchsorted(buckets, random_vars)
+            new_particles[:] = self.particles[items]
+            self.particles[:] = new_particles[:]
+            self.weights[:] = smples
+            # END QUESTION 3.2
