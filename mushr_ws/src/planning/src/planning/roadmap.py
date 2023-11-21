@@ -103,8 +103,8 @@ class Roadmap(object):
         # # Vectorized Version
         # vectorFunc = np.vectorize(self.check_edge_validity, otypes=[int])
         # res = vectorFunc(weighted_edges[:, :1].astype(int), weighted_edges[:, 1:2].astype(int))
-        u = weighted_edges[:, :1].astype(int)
-        v = weighted_edges[:, 1:2].astype(int)
+        u = weighted_edges[:, 0].astype(int)
+        v = weighted_edges[:, 1].astype(int)
         for i in range(weighted_edges.shape[0]):
             mask[i] = self.check_edge_validity(u[i], v[i])
 
